@@ -1,0 +1,187 @@
+---
+title: "Basic R and Intro to Predictive Models"
+author: "Andrew Wang"
+date: "10/9/2021"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+fontsize: 12pt
+urlcolor: green
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Question 1
+
+a) $\sum_{i=1}^N (Y_i - \bar{Y}) = (Y_1 -\bar{Y}) + (Y_2 - \bar{Y}) + (Y_3 - \bar{Y}) + ... + (Y_N - \bar{Y})$
+- $(Y_1 -\bar{Y}) + (Y_2 - \bar{Y}) + (Y_3 - \bar{Y}) + ... + (Y_N - \bar{Y}) = (Y_1 + Y_2 + ... + Y_N) - N(\bar{Y})$
+- We also know that sample mean $\bar{Y}$ is equal to the following: $\bar{Y} = \frac{1}{N}Y_1 + \frac{1}{N}Y_2+...+\frac{1}{N}Y_N$. We can substitute in the above equation for $\bar{Y}$ as shown below
+- $(Y_1 + Y_2 + ... + Y_N) - N(\bar{Y}) = (Y_1 + Y_2 + ... + Y_N) - N(\frac{1}{N}Y_1 + \frac{1}{N}Y_2+...+\frac{1}{N}Y_N) = (Y_1 + Y_2 + ... + Y_N) - (Y_1 + Y_2 + ... + Y_N) = 0$
+- Therefore, we prove that $\sum_{i=1}^N (Y_i - \bar{Y}) = 0$
+
+b) $\sum_{i=1}^N (X_i - \bar{X})(Y_i - \bar{Y}) = (X_1 - \bar{X})(Y_1 - \bar{Y}) + (X_2 - \bar{X})(Y_2 - \bar{Y}) + ... + (X_N - \bar{X})(Y_N - \bar{Y})$
+- $(X_1 - \bar{X})(Y_1 - \bar{Y}) + (X_2 - \bar{X})(Y_2 - \bar{Y}) + ... + (X_N - \bar{X})(Y_N - \bar{Y}) = (X_1Y_1 + X_2Y_2 + ...+X_NY_N) - (X_1\bar{Y} + X_2\bar{Y} + ... + X_N\bar{Y}) - (Y_1\bar{X} + Y_2\bar{X} + ... + Y_2\bar{X}) +N(\bar{X}\bar{Y})$
+- Let's substitute in the sample mean for X which is $\bar{X} = \frac{1}{N}X_1 + \frac{1}{N}X_2+...+\frac{1}{N}X_N$ into the last part of our equation so far.
+- Now we have $(X_1Y_1 + X_2Y_2 + ...+X_NY_N) - (X_1\bar{Y} + X_2\bar{Y} + ... + X_N\bar{Y}) - (Y_1\bar{X} + Y_2\bar{X} + ... + Y_2\bar{X}) +N(\frac{1}{N}X_1\bar{Y} + \frac{1}{N}X_2\bar{Y} + ... + \frac{1}{N}X_N\bar{Y})$
+- We can simplify the last part of our equation in the next part
+- We now have $(X_1Y_1 + X_2Y_2 + ...+X_NY_N) - (X_1\bar{Y} + X_2\bar{Y} + ... + X_N\bar{Y}) - (Y_1\bar{X} + Y_2\bar{X} + ... + Y_2\bar{X}) +(X_1\bar{Y} + X_2\bar{Y} + ... + X_N\bar{Y})$ and the second and fourth parts of our equation now cancel each other out.
+- We're left with $(X_1Y_1 + X_2Y_2 + ...+X_NY_N) - (Y_1\bar{X} + Y_2\bar{X} + ... + Y_2\bar{X})$ which can be re-written as $Y_1(X_1 - \bar{X}) + Y_2(X_2 - \bar{X}) + ... + Y_N(X_N - \bar{X})$ and this simplifies to the summation notation of $\sum_{i=1}^N (X_i - \bar{X})Y_i$
+- Thus, we've proven that $\sum_{i=1}^N (X_i - \bar{X})(Y_i - \bar{Y}) = \sum_{i=1}^N (X_i - \bar{X})Y_i$
+
+### Question 2
+
+a) The expectation of a random variable "X" can be denoted as $\mathbb{E}[X]$ and it can be thought of as the average value attained by that variable. The expectation of a random variable can also be referred to as the "mean" or $\mu_X$.
+b) The sample average is the mean of the values of a variable "X" within a sample. The difference between the expectation of a random variable and the sample average, is that expectation of a random variable is based on a probability concept of what you expect the value to be. The sample average instead is just the sum of all values in a sample divided by the total number of values.
+
+### Question 3
+
+a) The Central Limit Theorem stated simply is the idea that as your sample size gets larger and larger, the sampling distribution of the mean will get closer to assuming a normal distribution.
+b) In the curve below, it follows a roughly logarithmic growth pattern. As we increase x on  the horizontal scale, the density increases at a marginally decreasing scale on the y axis.
+```{r}
+curve(dgamma(x, shape=2, scale=2, log = FALSE))
+```
+
+c) The sample average of the first calculated $\bar{X}_n$ is 3.1. Below is the histogram of r=1000 values, and I see that each iteration of $\bar{X}_n$ is centered largely between 3 to 5.
+```{r}
+iter = 1000
+X_mean = numeric(iter)
+
+n = 10
+for (i in 1:iter){
+  X = rgamma(n=10, shape=2, scale=2)
+  X_mean[i] = mean(X)
+}
+
+hist(X_mean)
+
+```
+
+d) Now that n = 100, we can see that there's much less variation in the size of $\bar{X}_n$, and most of the iterations of $\bar{X}_n$ are found within 3.5 to 4.5. So definitely a smaller interval compared to the distribution in part c.
+```{r}
+iter = 1000
+X_mean = numeric(iter)
+
+n = 100
+for (i in 1:iter){
+  X = rgamma(n=100, shape=2, scale=2)
+  X_mean[i] = mean(X)
+}
+
+hist(X_mean)
+```
+
+### Question 4
+
+```{r}
+norm_dist = rnorm(n)
+t_dist = rt(n, df=5)
+
+hist(norm_dist, t_dist, col=scales::alpha("blue",0.5), xlim=c(-5,5))
+```
+
+### Question 5
+
+a) The standard error of the mean for the VFIAX index fund return is 0.004 as we can see from the table below.
+```{r}
+data(Vanguard, package="DataAnalytics")
+library(reshape2)
+Van = Vanguard[ , c(1,2,5)]
+V_reshaped = dcast(Van, date~ticker, value.var="mret")
+library(DataAnalytics)
+descStat(V_reshaped)
+```
+
+b) This is a problem for a financial analyst because it means there is a high amount of volatility in estimating the return on each fund. Therefore, the financial analyst wouldn't be able to properly assess the predicted performance of each fund in the future with confidence.
+
+c) To reduce the standard error of the mean to 1/10th of the size of the mean return, we could look at the formula used to calculate standard error of mean which is $s_\bar{Y} = s_Y/\sqrt{N}$ and we'd need to get $s_\bar{Y} = s_Y/10\sqrt{N}$ to reduce SE of the mean to 1/10th of the original size. So if our sample size is currently 349, we'd need to increase sample to n = 34,900.
+
+### Question 6
+
+Part A)
+
+1. 
+```{r echo=TRUE}
+library(DataAnalytics)
+data(mvehicles)
+
+head(cars$make == "Ford", n=50)
+```
+
+2. 
+```{r}
+fords = cars[cars$make == "Ford",]
+fords_f5 = head(fords,n=5)
+fords_f5
+```
+
+3. As shown below, there are 43 Kia observations in the cars data frame.
+```{r echo=TRUE}
+kias = cars[cars$make == "Kia",]
+nrow(kias)
+```
+
+4. As shown below, there are
+```{r}
+greater_emv = cars[cars$emv > 100000,]
+nrow(greater_emv)
+```
+
+Part B)
+
+1. The average sales for all cars made in Europe with price above $75,000 is about 627 as shown below:
+```{r}
+europe = cars[grepl("Europe", cars$origin,ignore.case=TRUE),]
+europe_75 = europe[europe$emv > 75000, "sales"]
+mean(europe_75)
+```
+
+Part C)
+
+1. There are 1105 four door vehicles in cars.
+```{r}
+four_door = cars[grepl("4dr", cars$style,ignore.case=TRUE),]
+nrow(four_door)
+```
+
+2. There are 432 four door sedans in cars.
+```{r}
+four_sedan = cars[grepl("4dr Sedan", cars$style,ignore.case=TRUE),]
+nrow(four_sedan)
+```
+
+### Question 7
+
+a) The problem with displaying data in this manner is that there isn't necessarily a linear relationship between price and sales for Sedan cars as we can see below. So this graph doesn't help as much for estimation/prediction purposes. It also wouldn't account well for some of the extreme outliers as shown in the set. In addition, many of the data points are clustered around the lower left hand side of the graph so it's hard to see any differentiation for comparison.
+```{r}
+sedan_price = cars[cars$bodytype == "Sedan", "emv"]
+sedan_sales = cars[cars$bodytype == "Sedan", "sales"]
+plot(sedan_price, sedan_sales, xlim=c(0,150000), ylim=c(0,150000), xlab="Sedan Price", ylab="Sedan Sales", pch=20, col="blue")
+```
+
+b) This has improved visualization a bit to allow us to see some sort of linear relationship between the two log variables and compressing large values to give us a better picture of how price influences sales. However, it does not necessarily give us a strong linear relationship here as we can see there's a very weak negative correlation between the log of sedan price and the log of sedan sales.
+```{r eval=FALSE, include=FALSE}
+plot(log(sedan_sales)~log(sedan_price), data = cars[cars$bodytype == "Sedan", ], xlab='log(price)', pch=20, col='blue')
+```
+On the other hand, the sqrt transformation is somewhat more useful than the first plot we made as there's more of an obvious linear relationship here as well, but it still does not account for outliers.
+```{r eval=FALSE, include=FALSE}
+plot(sqrt(sedan_price), sqrt(sedan_sales), xlim=c(100,400), ylim=c(0,400), xlab="Sqrt(Sedan Price)", ylab="Sqrt(Sedan Sales)", pch=20, col="blue")
+```
+
+c) According to our first plot, this isn't necessarily true. As we can see from our first plot of price and sales, we can see that some cars with very high prices have similar sales to cars with very low prices. So sales will not always change for all cars if prices change too.
+
+d)
+```{r eval=FALSE, include=FALSE}
+outlm=lm(log(sedan_sales)~log(sedan_price))
+plot(log(sedan_price), log(sedan_sales), xlab="Log(Sedan Price)", ylab="Log(Sedan Sales)", pch=20, col="blue")
+abline(outlm$coef,lwd=2,col="red")
+```
+
+e) Sales for price = $45,000 would be about 933 cars.
+```{r eval=FALSE, include=FALSE}
+log_sedan_price_predict = log(sedan_price)
+predict(outlm, new=data.frame(log_sedan_price_predict = log(45000)))
+exp(6.837966)
+```
